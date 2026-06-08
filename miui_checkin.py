@@ -284,9 +284,12 @@ def _phone_login(account: str, password: str) -> dict:
         for key in safe_keys:
             if key in auth:
                 value = str(auth.get(key))
-                if len(value) > 300:
-                    value = value[:300] + "...省略..."
                 print(f"{key}: {value}")
+                
+                if key == "notificationUrl" and value and value != "None":
+                    with open("miui_notification_url.txt", "w", encoding="utf-8") as f:
+                        f.write(value)
+                    print("完整安全验证链接已保存到：miui_notification_url.txt")
         
         print("返回字段：", list(auth.keys()))
         print("========================================\n")
