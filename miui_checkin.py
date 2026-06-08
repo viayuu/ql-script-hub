@@ -263,7 +263,38 @@ def _phone_login(account: str, password: str) -> dict:
     nonce = auth.get("nonce")
 
     if not ssecurity or nonce is None:
-        return {}
+        print("\n========== 小米登录接口返回诊断 ==========")
+        
+        safe_keys = [
+            "code",
+            "desc",
+            "description",
+            "message",
+            "reason",
+            "status",
+            "result",
+            "captchaUrl",
+            "notificationUrl",
+            "location",
+            "pwd",
+            "userId",
+            "securityStatus",
+        ]
+        
+        for key in safe_keys:
+            if key in auth:
+                value = str(auth.get(key))
+                if len(value) > 300:
+                    value = value[:300] + "...省略..."
+                print(f"{key}: {value}")
+        
+        print("返回字段：", list(auth.keys()))
+        print("========================================\n")
+        
+        raise RuntimeError(
+            "小米登录接口未返回 ssecurity/nonce。"
+            "通常原因：验证码、二次验证、账号风控、接口参数失效，或该账号不允许这种 SDK 登录。"
+        )
 
     sha1_value = hashlib.sha1(
         f"nonce={nonce}&{ssecurity}".encode()
